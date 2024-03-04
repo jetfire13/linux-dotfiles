@@ -4,7 +4,7 @@
 static const unsigned int borderpx = 2; /* border pixel of windows */
 static const int startwithgaps[] = {1}; /* 1 means gaps are used by default, this can be customized for each tag */
 static const unsigned int gappx[] = {
-    2};                              /* default gap between windows in pixels, this can be customized for each tag */
+    4};                              /* default gap between windows in pixels, this can be customized for each tag */
 static const unsigned int snap = 32; /* snap pixel */
 static const int showbar = 1;        /* 0 means no bar */
 static const int topbar = 0;         /* 0 means bottom bar */
@@ -40,7 +40,7 @@ static const char *const autostart[] = {"alacritty",
                                         NULL,
                                         "feh",
                                         "--bg-fill",
-                                        "/home/jetfire/WallPapers/dmc5.jpg",
+                                        "/home/jetfire/Pictures/WallPapers/dmc5.jpg",
                                         NULL,
                                         NULL /*terminate*/};
 
@@ -73,6 +73,8 @@ static const Layout layouts[] = {
 
 /* key definitions */
 #define MODKEY Mod1Mask
+#define WINKEY Mod4Mask
+
 #define TAGKEYS(KEY, TAG)                                                                                              \
     {MODKEY, KEY, view, {.ui = 1 << TAG}}, {MODKEY | ControlMask, KEY, toggleview, {.ui = 1 << TAG}},                  \
         {MODKEY | ShiftMask, KEY, tag, {.ui = 1 << TAG}},                                                              \
@@ -96,18 +98,29 @@ static const char *termcmd[] = {"alacritty", NULL};
 static const char *termcmdfloat[] = {"alacritty-floating", NULL};
 static const char *thunar[] = {"thunar", NULL};
 
+/*Volume keys*/
 #include <X11/XF86keysym.h>
 static const char *mutevol[] = {"/usr/share/scripts/dwm_volume", "--toggle", NULL};
 static const char *mutemicp[] = {"mutemic", NULL};
 static const char *downvol[] = {"/usr/share/scripts/dwm_volume", "--dec", NULL};
 static const char *upvol[] = {"/usr/share/scripts/dwm_volume", "--inc", NULL};
 
+/*Screenshots*/
+static const char *shotnow[] = {"/usr/share/scripts/dwm_screenshot", "--now", NULL};
+static const char *shotwin[] = {"/usr/share/scripts/dwm_screenshot", "--win", NULL};
+static const char *shotarea[] = {"/usr/share/scripts/dwm_screenshot", "--area", NULL};
+
 static const Key keys[] = {
     /* modifier                     key        function        argument */
-    // Hardware Keys -----------
+    /* Hardware Keys */
     {0, XF86XK_AudioMute, spawn, {.v = mutevol}},
     {0, XF86XK_AudioLowerVolume, spawn, {.v = downvol}},
     {0, XF86XK_AudioRaiseVolume, spawn, {.v = upvol}},
+
+    /*Scrinshots*/
+    {0, XK_Print, spawn, {.v = shotnow}},
+    {WINKEY, XK_Print, spawn, {.v = shotwin}},
+    {MODKEY, XK_Print, spawn, {.v = shotarea}},
     {MODKEY, XK_p, spawn, {.v = dmenucmd}},
     {MODKEY, XK_Return, spawn, {.v = termcmdfloat}},
     {MODKEY | ShiftMask, XK_Return, spawn, {.v = termcmd}},
@@ -121,7 +134,7 @@ static const Key keys[] = {
     {MODKEY, XK_l, setmfact, {.f = +0.05}},
     {MODKEY, XK_Return, zoom, {0}},
     {MODKEY, XK_Tab, view, {0}},
-    {MODKEY | ShiftMask, XK_c, killclient, {0}},
+    {MODKEY, XK_q, killclient, {0}},
     {MODKEY, XK_t, setlayout, {.v = &layouts[0]}},
     {MODKEY, XK_f, setlayout, {.v = &layouts[1]}},
     {MODKEY, XK_m, setlayout, {.v = &layouts[2]}},
