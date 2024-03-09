@@ -1,25 +1,4 @@
 --[[
-
-=====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
-========                                    .-----.          ========
-========         .----------------------.   | === |          ========
-========         |.-""""""""""""""""""-.|   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||   KICKSTART.NVIM   ||   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||                    ||   |-----|          ========
-========         ||:Tutor              ||   |:::::|          ========
-========         |'-..................-'|   |____o|          ========
-========         `"")----------------(""`   ___________      ========
-========        /::::::::::|  |::::::::::\  \ no mouse \     ========
-========       /:::========|  |==hjkl==:::\  \ required \    ========
-========      '""""""""""""'  '""""""""""""'  '""""""""""'   ========
-========                                                     ========
-=====================================================================
-=====================================================================
-
 What is Kickstart?
 
   Kickstart.nvim is *not* a distribution.
@@ -184,6 +163,7 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 
 vim.keymap.set('n', '<tab>', '<cmd>bnext<CR>')
 vim.keymap.set('n', '<S-tab>', '<cmd>bprev<CR>')
+vim.keymap.set('n', '<C-x>', '<cmd>bdelete<CR>')
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
 --
@@ -201,6 +181,8 @@ vim.keymap.set('i', '<C-v>', '<Esc>"+pi', { noremap = true, silent = true })
 vim.keymap.set('i', '<C-z>', '<Esc>ui', { noremap = true, silent = true })
 vim.keymap.set('i', '<C-z>', '<Esc>ui', { noremap = true, silent = true })
 
+-- save in insert mode
+vim.keymap.set('i', '<C-s>', '<Esc><cmd>:w<CR>', { noremap = true, silent = true })
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -297,7 +279,6 @@ require('lazy').setup {
         ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
         ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
         ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-        ['<C-b>'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
       }
     end,
   },
@@ -746,12 +727,15 @@ require('lazy').setup {
     -- change the command in the config to whatever the name of that colorscheme is
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`
-    'folke/tokyonight.nvim',
+    -- 'folke/tokyonight.nvim',
+    -- 'rebelot/kanagawa.nvim',
+    'NTBBloodbath/doom-one.nvim',
     lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       -- Load the colorscheme here
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'doom-one'
 
       -- You can configure highlights by doing something like
       vim.cmd.hi 'Comment gui=none'
@@ -857,14 +841,20 @@ require('lazy').setup {
             command = 'gdb',
             args = { '-i', 'dap' },
           }
+          dap.adapters.lldb = {
+            type = 'executable',
+            command = 'lldb-vscode',
+            name = 'lldb',
+          }
           dap.configurations.cpp = {
             {
               name = 'Launch',
-              type = 'gdb',
+              type = 'lldb',
               request = 'launch',
               program = function()
                 return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
               end,
+              stopOnEntry = false,
               cwd = '${workspaceFolder}',
               stopAtBeginningOfMainSubprogram = false,
             },
@@ -914,18 +904,18 @@ require('lazy').setup {
 
   -- stylua: ignore
   keys = {
-    { "<C-d>B", function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = "Breakpoint Condition" },
-    { "<C-d>b", function() require("dap").toggle_breakpoint() end, desc = "Toggle Breakpoint" },
+    { "<C-F9>", function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = "Breakpoint Condition" },
+    { "<F9>", function() require("dap").toggle_breakpoint() end, desc = "Toggle Breakpoint" },
     { "<C-d>c", function() require("dap").continue() end, desc = "Continue" },
     { "<C-d>a", function() require("dap").continue({ before = get_args }) end, desc = "Run with Args" },
     { "<C-d>C", function() require("dap").run_to_cursor() end, desc = "Run to Cursor" },
     { "<C-d>g", function() require("dap").goto_() end, desc = "Go to line (no execute)" },
-    { "<C-d>i", function() require("dap").step_into() end, desc = "Step Into" },
+    { "<F7>", function() require("dap").step_into() end, desc = "Step Into" },
     { "<C-d>j", function() require("dap").down() end, desc = "Down" },
     { "<C-d>k", function() require("dap").up() end, desc = "Up" },
     { "<C-d>l", function() require("dap").run_last() end, desc = "Run Last" },
-    { "<C-d>o", function() require("dap").step_out() end, desc = "Step Out" },
-    { "<C-d>O", function() require("dap").step_over() end, desc = "Step Over" },
+    { "<C-F8>", function() require("dap").step_out() end, desc = "Step Out" },
+    { "<F8>", function() require("dap").step_over() end, desc = "Step Over" },
     { "<C-d>p", function() require("dap").pause() end, desc = "Pause" },
     { "<C-d>r", function() require("dap").repl.toggle() end, desc = "Toggle REPL" },
     { "<C-d>s", function() require("dap").session() end, desc = "Session" },
