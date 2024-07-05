@@ -86,8 +86,8 @@ enum escape_state {
 
 typedef struct {
 	Glyph attr; /* current char attributes */
-	int x; /* terminal column */
-	int y; /* terminal row */
+	int x;
+	int y;
 	char state;
 } TCursor;
 
@@ -1132,6 +1132,7 @@ csiparse(void)
 {
 	char *p = csiescseq.buf, *np;
 	long int v;
+	int sep = ';'; /* colon or semi-colon, but not both */
 
 	csiescseq.narg = 0;
 	if (*p == '?') {
@@ -1149,7 +1150,9 @@ csiparse(void)
 			v = -1;
 		csiescseq.arg[csiescseq.narg++] = v;
 		p = np;
-		if (*p != ';' || csiescseq.narg == ESC_ARG_SIZ)
+		if (sep == ';' && *p == ':')
+			sep = ':'; /* allow override to colon once */
+		if (*p != sep || csiescseq.narg == ESC_ARG_SIZ)
 			break;
 		p++;
 	}
@@ -1643,7 +1646,7 @@ csihandle(void)
 			ttywrite(vtiden, strlen(vtiden), 0);
 		break;
 	case 'b': /* REP -- if last char is printable print it <n> more times */
-		DEFAULT(csiescseq.arg[0], 1);
+		LIMIT(csiescseq.arg[0], 1, 65535);
 		if (term.lastc)
 			while (csiescseq.arg[0]-- > 0)
 				tputc(term.lastc);
@@ -2175,16 +2178,12 @@ tstrsequence(uchar c)
 void
 tcontrolcode(uchar ascii)
 {
-	size_t i;
-
 	switch (ascii) {
 	case '\t':   /* HT */
 		tputtab(1);
 		return;
 	case '\b':   /* BS */
-		for (i = 1; term.c.x && term.line[term.c.y][term.c.x - i].u == 0; ++i)
-			;
-		tmoveto(term.c.x - i, term.c.y);
+		tmoveto(term.c.x-1, term.c.y);
 		return;
 	case '\r':   /* CR */
 		tmoveto(0, term.c.y);

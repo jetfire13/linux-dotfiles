@@ -1,0 +1,85 @@
+#!/bin/sh
+
+notify_cmd='dunstify -u low -h string:x-dunst-stack-tag:obvolume'
+
+# Get Volume
+get_volume() {
+	echo "`wpctl get-volume @DEFAULT_AUDIO_SINK@ | cut -d' ' -f2 | tr -d '.' | sed 's/^0//'`"
+}
+
+get_mute() {
+	echo "`wpctl get-volume @DEFAULT_AUDIO_SINK@ | cut -d' ' -f3`"
+}
+
+
+# Get icons
+get_icon() {
+current="$(get_volume)"
+if [[ "$current" -eq "0" ]]; then
+	icon=" "
+elif [[ ("$current" -ge "00") && ("$current" -le "50") ]]; then
+	icon="  "
+elif [[ ("$current" -ge "50") ]]; then
+	icon="  "
+fi
+echo $icon
+}
+
+# Notify
+notify_user() {
+	${notify_cmd} "$(get_icon) $(get_volume)%"
+}
+
+# Increase Volume
+inc_volume() {
+	[[ $(get_mute) == "[MUTED]" ]] && wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+	wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+ && notify_user
+}
+
+# Decrease Volume
+dec_volume() {
+	[[ $(get_mute) == "[MUTED]" ]] && wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+	wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && notify_user
+}
+
+# Toggle Mute
+toggle_mute() {
+	wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+
+	if [[ $(get_mute) == "[MUTED]" ]]; then
+		${notify_cmd} " "
+	else
+		${notify_cmd} " "
+	fi
+}
+
+# Toggle Mic
+# toggle_mic() {
+# 	# ID="`pulsemixer --list-sources | grep 'Default' | cut -d',' -f1 | cut -d' ' -f3`"
+# 	# if [[ `pulsemixer --id $ID --get-mute` == 0 ]]; then
+# 	# 	#pulsemixer --id ${ID} --toggle-mute && ${notify_cmd} -i "$iDIR/microphone-mute.png" "Microphone Switched OFF"
+# 	# 	pulsemixer --id ${ID} --toggle-mute && ${notify_cmd} -i "Microphone Switched OFF"
+# 	# else
+# 	# 	#pulsemixer --id ${ID} --toggle-mute && ${notify_cmd} -i "$iDIR/microphone.png" "Microphone Switched ON"
+# 	# 	pulsemixer --id ${ID} --toggle-mute && ${notify_cmd} -i "Microphone Switched ON"
+# 	# fi
+# }
+
+# Execute accordingly
+if [[ -x `which wpctl` ]]; then
+	if [[ "$1" == "--get" ]]; then
+		get_volume
+	elif [[ "$1" == "--inc" ]]; then
+		inc_volume
+	elif [[ "$1" == "--dec" ]]; then
+		dec_volume
+	elif [[ "$1" == "--toggle" ]]; then
+		toggle_mute
+	elif [[ "$1" == "--toggle-mic" ]]; then
+		toggle_mic
+	else
+		echo $(get_volume)%
+	fi
+else
+	${notify_cmd} "'wireplumber' is not installed."
+fi

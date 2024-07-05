@@ -1,0 +1,28 @@
+#!/bin/sh
+# Utility functions for theming statusbar scripts.
+
+display() {
+    if [ -n "$2" ]; then
+        color="$2"
+    else
+        case "$(basename "$0")" in
+            sb-mail) color=#dcd7ba ;;
+            sb-music) color=#dcd7ba ;;
+            sb-disk) color=#dcd7ba ;;
+            sb-memory) color=#dcd7ba ;;
+            sb-loadavg) color=#dcd7ba ;;
+            sb-mic) color=#dcd7ba ;;
+            sb-record) color=#dcd7ba ;;
+            sb-volume) color=#dcd7ba ;;
+            sb-battery) color=#dcd7ba ;;
+            sb-date) color=#dcd7ba ;;
+            sb-network) color=#dcd7ba ;;
+            *) color=#dcd7ba ;;
+        esac
+    fi
+
+    case "$STATUSBAR" in
+        dwmblocks) echo "^c$color^$1" ;;
+        *) echo "$1" ;;
+    esac
+}
