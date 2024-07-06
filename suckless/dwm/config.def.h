@@ -39,8 +39,8 @@ static const char *const autostart[] = {
 
 /* tagging */
 // static const char *tags[]     = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-static const char *tags[] = {"", "", "", "", "", "", "", "", ""};
-static const int taglayouts[] = {  0,   0,   0,   0,   1,   0,   0,   0,   0  };
+static const char *tags[] = {"", "", "", "", "", "", "", "", ""};
+static const int taglayouts[] = {  0,   0,   0,   0,   0,   0,   0,   0,   0  };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -54,7 +54,7 @@ static const Rule rules[] = {
 	{ "alacritty-floating",     NULL,       NULL,       0,            1,           -1 },
 	{ "feh",                    NULL,       NULL,       0,            1,           -1 },
 	{ "Blueman-manager",        NULL,       NULL,       0,            1,           -1 },
-	{ "steam",                  NULL,       NULL,       1 << 4,       1,           -1 },
+	{ "steam",                  NULL,       NULL,       1 << 4,       0,           -1 },
 };
 
 /* layout(s) */
@@ -124,6 +124,7 @@ static const Key keys[] = {
 	{ ALTKEY|ShiftMask,             XK_g,      setlayout,      {.v = &layouts[3]} },
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
+	{ MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
 	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
