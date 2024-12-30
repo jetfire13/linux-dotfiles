@@ -83,6 +83,7 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.autoindent = true
+vim.opt.smartindent = true
 -- line wrapping
 vim.opt.wrap = true
 vim.opt.linebreak = true
@@ -345,10 +346,10 @@ require('lazy').setup {
         defaults = {
           mappings = {
             i = {
-              ['<C-j>'] = 'move_selection_next',
-              ['<C-k>'] = 'move_selection_previous',
+              -- ['<C-j>'] = 'move_selection_next',
+              -- ['<C-k>'] = 'move_selection_previous',
               ['<C-y>'] = 'select_default',
-              ['<C-u>'] = 'select_horizontal',
+              -- ['<C-u>'] = 'select_horizontal',
             },
           },
         },
@@ -617,6 +618,8 @@ require('lazy').setup {
       },
       formatters_by_ft = {
         lua = { 'stylua' },
+        cpp = { 'clang-format' },
+        h = { 'clang-format' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -729,13 +732,18 @@ require('lazy').setup {
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`
     -- 'folke/tokyonight.nvim',
     -- 'rebelot/kanagawa.nvim',
-    'NTBBloodbath/doom-one.nvim',
+    -- 'NTBBloodbath/doom-one.nvim',
+    -- 'EdenEast/nightfox.nvim',
+    'yorickpeterse/vim-paper',
+    -- 'catppuccin/nvim',
     lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
-      -- Load the colorscheme here
       -- vim.cmd.colorscheme 'tokyonight-night'
-      vim.cmd.colorscheme 'doom-one'
+      -- vim.cmd.colorscheme 'kanagawa-wave'
+      -- vim.cmd.colorscheme 'kanagawa-lotus'
+      -- vim.cmd.colorscheme 'catppuccin-latte'
+      vim.cmd.colorscheme 'paper'
 
       -- You can configure highlights by doing something like
       vim.cmd.hi 'Comment gui=none'
@@ -817,7 +825,10 @@ require('lazy').setup {
     },
     vim.keymap.set('n', '<C-b>', '<Cmd>Neotree toggle<CR>'),
   },
-
+  {
+    'nvim-neotest/nvim-nio',
+  },
+  { 'kevinhwang91/nvim-ufo', requires = 'kevinhwang91/promise-async' },
   {
     'mfussenegger/nvim-dap',
 
@@ -826,11 +837,11 @@ require('lazy').setup {
       -- fancy UI for the debugger
       {
         'rcarriga/nvim-dap-ui',
-      -- stylua: ignore
-      keys = {
-        { "<C-d>u", function() require("dapui").toggle({ }) end, desc = "Dap UI" },
-        { "<C-d>e", function() require("dapui").eval() end, desc = "Eval", mode = {"n", "v"} },
-      },
+        -- stylua: ignore
+        keys = {
+          { "<C-d>u", function() require("dapui").toggle({}) end,  desc = "Dap UI" },
+          { "<C-d>e", function() require("dapui").eval() end,      desc = "Eval",  mode = { "n", "v" } },
+        },
         opts = {},
         config = function(_, opts)
           -- setup dap config by VsCode launch.json file
@@ -841,6 +852,17 @@ require('lazy').setup {
             command = 'gdb',
             args = { '-i', 'dap' },
           }
+          dap.adapters.codelldb = {
+            type = 'server',
+            host = '127.0.0.1',
+            port = 13000,
+            executable = {
+              command = 'codelldb',
+              args = { '--port', '{$port}' },
+              detached = false,
+            },
+            name = 'codelldb',
+          }
           dap.adapters.lldb = {
             type = 'executable',
             command = 'lldb-vscode',
@@ -848,15 +870,15 @@ require('lazy').setup {
           }
           dap.configurations.cpp = {
             {
-              name = 'Launch',
-              type = 'lldb',
+              type = 'codelldb',
               request = 'launch',
               program = function()
                 return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
               end,
-              stopOnEntry = false,
-              cwd = '${workspaceFolder}',
-              stopAtBeginningOfMainSubprogram = false,
+              --program = '${fileDirname}/${fileBasenameNoExtension}',
+              -- cwd = '${workspaceFolder}',
+              cwd = vim.fn.getcwd(),
+              terminal = 'integrated',
             },
           }
           local dapui = require 'dapui'
@@ -902,26 +924,26 @@ require('lazy').setup {
       },
     },
 
-  -- stylua: ignore
-  keys = {
-    { "<C-F9>", function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = "Breakpoint Condition" },
-    { "<F9>", function() require("dap").toggle_breakpoint() end, desc = "Toggle Breakpoint" },
-    { "<C-d>c", function() require("dap").continue() end, desc = "Continue" },
-    { "<C-d>a", function() require("dap").continue({ before = get_args }) end, desc = "Run with Args" },
-    { "<C-d>C", function() require("dap").run_to_cursor() end, desc = "Run to Cursor" },
-    { "<C-d>g", function() require("dap").goto_() end, desc = "Go to line (no execute)" },
-    { "<F7>", function() require("dap").step_into() end, desc = "Step Into" },
-    { "<C-d>j", function() require("dap").down() end, desc = "Down" },
-    { "<C-d>k", function() require("dap").up() end, desc = "Up" },
-    { "<C-d>l", function() require("dap").run_last() end, desc = "Run Last" },
-    { "<C-F8>", function() require("dap").step_out() end, desc = "Step Out" },
-    { "<F8>", function() require("dap").step_over() end, desc = "Step Over" },
-    { "<C-d>p", function() require("dap").pause() end, desc = "Pause" },
-    { "<C-d>r", function() require("dap").repl.toggle() end, desc = "Toggle REPL" },
-    { "<C-d>s", function() require("dap").session() end, desc = "Session" },
-    { "<C-d>t", function() require("dap").terminate() end, desc = "Terminate" },
-    { "<C-d>w", function() require("dap.ui.widgets").hover() end, desc = "Widgets" },
-  },
+    -- stylua: ignore
+    keys = {
+      { "<C-F9>", function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = "Breakpoint Condition" },
+      { "<F9>",   function() require("dap").toggle_breakpoint() end,                                    desc = "Toggle Breakpoint" },
+      { "<C-d>c", function() require("dap").continue() end,                                             desc = "Continue" },
+      { "<C-d>a", function() require("dap").continue({ before = get_args }) end,                        desc = "Run with Args" },
+      { "<C-d>C", function() require("dap").run_to_cursor() end,                                        desc = "Run to Cursor" },
+      { "<C-d>g", function() require("dap").goto_() end,                                                desc = "Go to line (no execute)" },
+      { "<F7>",   function() require("dap").step_into() end,                                            desc = "Step Into" },
+      { "<C-d>j", function() require("dap").down() end,                                                 desc = "Down" },
+      { "<C-d>k", function() require("dap").up() end,                                                   desc = "Up" },
+      { "<C-d>l", function() require("dap").run_last() end,                                             desc = "Run Last" },
+      { "<C-F8>", function() require("dap").step_out() end,                                             desc = "Step Out" },
+      { "<F8>",   function() require("dap").step_over() end,                                            desc = "Step Over" },
+      { "<C-d>p", function() require("dap").pause() end,                                                desc = "Pause" },
+      { "<C-d>r", function() require("dap").repl.toggle() end,                                          desc = "Toggle REPL" },
+      { "<C-d>s", function() require("dap").session() end,                                              desc = "Session" },
+      { "<C-d>t", function() require("dap").terminate() end,                                            desc = "Terminate" },
+      { "<C-d>w", function() require("dap.ui.widgets").hover() end,                                     desc = "Widgets" },
+    },
 
     -- config = function()
     --   local Config = require 'lazyvim.config'
@@ -980,6 +1002,7 @@ vim.opt.termguicolors = true
 require('bufferline').setup {
   options = {
     show_close_icon = false,
+    separator_style = 'slant',
     diagnostics = 'nvim_lsp',
     diagnostics_indicator = function(count, level, diagnostics_dict, context)
       local icon = level:match 'error' and ' ' or ' '
