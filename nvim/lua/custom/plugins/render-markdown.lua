@@ -8,8 +8,39 @@ return {
     config = function()
         require('render-markdown').setup {
             indent = {
-                enabled = true,
-                skip_heading = true,
+                enabled = false,
+                -- skip_heading = true,
+            },
+            heading = {
+                sign = true,
+                position = 'inline',
+                width = 'block',
+                left_margin = 0.5,
+                left_pad = 0.2,
+                right_pad = 0.2,
+                icons = { ' ' },
+                backgrounds = {
+                    'RenderMarkdownH1Bg',
+                    'RenderMarkdownH1Bg',
+                    'RenderMarkdownH1Bg',
+                    'RenderMarkdownH1Bg',
+                    'RenderMarkdownH1Bg',
+                    'RenderMarkdownH1Bg',
+                    -- 'RenderMarkdownH1Bg',
+                    -- 'RenderMarkdownH2Bg',
+                    -- 'RenderMarkdownH3Bg',
+                    -- 'RenderMarkdownH4Bg',
+                    -- 'RenderMarkdownH5Bg',
+                    -- 'RenderMarkdownH6Bg',
+                },
+                foregrounds = {
+                    'RenderMarkdownH1',
+                    'RenderMarkdownH2',
+                    'RenderMarkdownH3',
+                    'RenderMarkdownH4',
+                    'RenderMarkdownH5',
+                    'RenderMarkdownH6',
+                },
             },
             code = {
                 enabled = true,
