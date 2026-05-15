@@ -1,11 +1,23 @@
-return {
-    'nvim-neo-tree/neo-tree.nvim',
-    branch = 'v3.x',
-    dependencies = {
-        'nvim-lua/plenary.nvim',
-        'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
-        'MunifTanjim/nui.nvim',
-        -- '3rd/image.nvim', -- Optional image support in preview window: See `# Preview Mode` for more information
+local plugins = {
+  { src = 'https://github.com/nvim-neo-tree/neo-tree.nvim', version = vim.version.range '*' },
+  'https://github.com/nvim-lua/plenary.nvim',
+  'https://github.com/MunifTanjim/nui.nvim',
+}
+
+if vim.g.have_nerd_font then
+  table.insert(plugins, 'https://github.com/nvim-tree/nvim-web-devicons') -- not strictly required, but recommended
+end
+
+vim.pack.add(plugins)
+
+vim.keymap.set('n', '<C-b>', '<Cmd>Neotree toggle<CR>', { desc = 'NeoTree reveal', silent = true })
+
+require('neo-tree').setup {
+  filesystem = {
+    window = {
+      mappings = {
+        ['\\'] = 'close_window',
+      },
     },
-    vim.keymap.set('n', '<C-b>', '<Cmd>Neotree toggle<CR>'),
+  },
 }

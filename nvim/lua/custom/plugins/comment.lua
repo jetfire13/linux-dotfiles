@@ -1,2 +1,1 @@
--- Use `opts = {}` to force a plugin to be loaded.
-return { 'numToStr/Comment.nvim', opts = {} }
+vim.pack.add { 'https://github.com/numToStr/Comment.nvim' }
